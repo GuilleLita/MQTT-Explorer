@@ -14,7 +14,7 @@
     "test:backend": "cd backend && yarn test",
     "install": "cd app && yarn && cd ..",
     "dev": "npm-run-all --parallel dev:*",
-    "dev:app": "cd app && npm run dev",
+    "dev:app": "cd app && yarn dev",
     "dev:electron": "tsc && electron . --development",
     "lint": "npm-run-all --parallel lint:prettier lint:tslint lint:spellcheck",
     "lint:fix": "npm-run-all lint:tslint:fix lint:prettier:fix",
@@ -130,6 +130,8 @@
     "sha1": "^1.1.1",
     "sparkplug-payload": "^1.0.3",
     "uuid": "^8.3.2",
+    "webpack": "^5.94.0",
+    "webpack-dev-server": "^5.1.0",
     "yarn-run-all": "^3.1.1"
   }
 }

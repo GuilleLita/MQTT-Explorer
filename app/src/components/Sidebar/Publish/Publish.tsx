@@ -61,6 +61,9 @@ function Publish(props: Props) {
     if (props.connectionId && topic) {
       amendToHistory(topic, payload)
     }
+    console.log(payload)
+
+
   }, [props, props.connectionId, props.topic, props.payload, amendToHistory])
 
   const handleSubmit = useCallback(
@@ -138,6 +141,7 @@ const EditorMode = memo(function EditorMode(props: {
         <FormatJsonButton editorMode={props.editorMode} focusEditor={props.focusEditor} formatJson={formatJson} />
         <OpenFileButton editorMode={props.editorMode} openFile={openFile} />
         <div style={{ float: 'right' }}>
+          <Testing publish={props.publish} focusEditor={props.focusEditor} actions={props.actions} />
           <PublishButton publish={props.publish} focusEditor={props.focusEditor} />
         </div>
       </div>
@@ -186,6 +190,7 @@ const PublishButton = memo(function PublishButton(props: { publish: () => void; 
   const handleClickPublish = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation()
+      console.log("payloas")
       props.publish()
     },
     [props.publish]
@@ -204,6 +209,42 @@ const PublishButton = memo(function PublishButton(props: { publish: () => void; 
     </Button>
   )
 })
+
+const Testing = memo(function TestingButton(props: { publish: () => void; focusEditor: () => void, actions: typeof publishActions }) {
+  const handleClickTesting = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation()
+      console.log("payloas")
+      var payloads = ['{"VIN": "231", "location": {"longitude": -0.82, "latitude": 41.6472}}']
+      var timeout = 0
+      payloads.forEach(element => {
+
+        setTimeout(() => {
+          props.actions.setPayload(element)
+          props.publish()
+          console.log("jeje")
+        }, timeout)
+        timeout += 10000
+      });
+    },
+    [props.publish]
+  )
+
+  return (
+    <Button
+      style={{ marginRight: '6px' }}
+      variant="contained"
+      size="small"
+      color="primary"
+      onClick={handleClickTesting}
+      onFocus={props.focusEditor}
+      id="testing-button"
+    >
+      <Navigation style={{ marginRight: '8px' }} /> Demo Test
+    </Button>
+  )
+})
+
 
 const mapDispatchToProps = (dispatch: any) => {
   return {
