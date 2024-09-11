@@ -70,7 +70,7 @@ async function executeBuild() {
   switch (process.argv[2]) {
     case 'win':
       await buildWithOptions(winPortable, { platform: 'win', package: 'portable' })
-      await buildWithOptions(winNsis, { platform: 'win', package: 'nsis' })
+      //await buildWithOptions(winNsis, { platform: 'win', package: 'nsis' })
       break
     case 'appx':
       await buildWithOptions(winAppx, { platform: 'win', package: 'appx' })

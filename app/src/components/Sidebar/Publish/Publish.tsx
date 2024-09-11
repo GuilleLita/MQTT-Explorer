@@ -8,7 +8,7 @@ import RetainSwitch from './RetainSwitch'
 import TopicInput from './TopicInput'
 import { AppState } from '../../../reducers'
 import { bindActionCreators } from 'redux'
-import { Button, Fab, Theme, Tooltip, withTheme } from '@material-ui/core'
+import { Button, Fab, MenuItem, Select, Theme, Tooltip, withTheme } from '@material-ui/core'
 import { connect } from 'react-redux'
 import { EditorModeSelect } from './EditorModeSelect'
 import { globalActions, publishActions } from '../../../actions'
@@ -41,9 +41,13 @@ function useHistory(): [Array<Message>, (topic: string, payload?: string) => voi
   return [history, amendToHistory]
 }
 
+
+
+
 function Publish(props: Props) {
   const editorRef = useRef<AceEditor>()
   const [history, amendToHistory] = useHistory()
+  const [age, setAge] = React.useState('TestDevice1');
 
   const focusEditor = useCallback(() => {
     editorRef.current?.editor.focus()
@@ -61,7 +65,6 @@ function Publish(props: Props) {
     if (props.connectionId && topic) {
       amendToHistory(topic, payload)
     }
-    console.log(payload)
 
 
   }, [props, props.connectionId, props.topic, props.payload, amendToHistory])
@@ -77,6 +80,15 @@ function Publish(props: Props) {
     [publish]
   )
 
+  const handleAge = useCallback(
+    (e: React.ChangeEvent<{ value: unknown }>) => {
+
+      setAge(e.target.value as string)
+      console.log(age)
+    },
+    []
+  )
+
   return useMemo(
     () => (
       <div style={{ flexGrow: 1, width: '100%' }} onKeyDown={handleSubmit}>
@@ -89,6 +101,8 @@ function Publish(props: Props) {
             payload={props.payload}
             editorMode={props.editorMode}
             publish={publish}
+            setVIN={handleAge}
+            VIN={age}
           />
           <Editor
             value={props.payload}
@@ -101,7 +115,7 @@ function Publish(props: Props) {
         <PublishHistory history={history} />
       </div>
     ),
-    [props.payload, props.editorMode, history, handleSubmit, publish]
+    [props.payload, props.editorMode, history, handleSubmit, publish, age, handleAge]
   )
 }
 
@@ -112,6 +126,8 @@ const EditorMode = memo(function EditorMode(props: {
   actions: typeof publishActions
   globalActions: typeof globalActions
   publish: () => void
+  setVIN: any
+  VIN: string
 }) {
   const updatePayload = props.actions.setPayload
 
@@ -141,7 +157,8 @@ const EditorMode = memo(function EditorMode(props: {
         <FormatJsonButton editorMode={props.editorMode} focusEditor={props.focusEditor} formatJson={formatJson} />
         <OpenFileButton editorMode={props.editorMode} openFile={openFile} />
         <div style={{ float: 'right' }}>
-          <Testing publish={props.publish} focusEditor={props.focusEditor} actions={props.actions} />
+          <VINSelector setVIN={props.setVIN} />
+          <Testing publish={props.publish} focusEditor={props.focusEditor} actions={props.actions} VIN={props.VIN} />
           <PublishButton publish={props.publish} focusEditor={props.focusEditor} />
         </div>
       </div>
@@ -190,7 +207,6 @@ const PublishButton = memo(function PublishButton(props: { publish: () => void; 
   const handleClickPublish = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation()
-      console.log("payloas")
       props.publish()
     },
     [props.publish]
@@ -210,24 +226,44 @@ const PublishButton = memo(function PublishButton(props: { publish: () => void; 
   )
 })
 
-const Testing = memo(function TestingButton(props: { publish: () => void; focusEditor: () => void, actions: typeof publishActions }) {
+const Testing = function TestingButton(props: { publish: () => void; focusEditor: () => void, actions: typeof publishActions, VIN: string }) {
+  console.log("props", props)
+
   const handleClickTesting = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation()
-      console.log("payloas")
-      var payloads = ['{"VIN": "231", "location": {"longitude": -0.82, "latitude": 41.6472}}']
+      console.log("payloas")/*
+      var payloads = ['{"VIN": "' + props.VIN + '" , "location": {"longitude": -0.810372, "latitude": 41.666130}}',
+      '{"VIN": "' + props.VIN + '" , "location": {"longitude": -0.809893, "latitude": 41.665973}}',
+      '{"VIN": "' + props.VIN + '" , "location": {"longitude": -0.809561, "latitude": 41.665876}}',
+      '{"VIN": "' + props.VIN + '" , "location": {"longitude": -0.809105, "latitude": 41.665732}}',
+      '{"VIN": "' + props.VIN + '" , "location": {"longitude": -0.808717, "latitude": 41.665612}}'
+      ]*/
+      var payloads = ['{"VIN": "' + "TestDevice1" + '" , "location": {"longitude": -0.810372, "latitude": 41.666130}}',
+      '{"VIN": "' + "TestDevice2" + '" , "location": {"longitude": -0.810751, "latitude": 41.666178}}',
+      '{"VIN": "' + "TestDevice1" + '" , "location": {"longitude": -0.809893, "latitude": 41.665973}}',
+      '{"VIN": "' + "TestDevice2" + '" , "location": {"longitude": -0.810243, "latitude": 41.666076}}',
+      '{"VIN": "' + "TestDevice1" + '" , "location": {"longitude": -0.809561, "latitude": 41.665876}}',
+      '{"VIN": "' + "TestDevice2" + '" , "location": {"longitude": -0.809561, "latitude": 41.665876}}',
+      '{"VIN": "' + "TestDevice1" + '" , "location": {"longitude": -0.809105, "latitude": 41.665732}}',
+      '{"VIN": "' + "TestDevice2" + '" , "location": {"longitude": -0.809105, "latitude": 41.665732}}',
+      '{"VIN": "' + "TestDevice1" + '" , "location": {"longitude": -0.808717, "latitude": 41.665612}}',
+      '{"VIN": "' + "TestDevice2" + '" , "location": {"longitude": -0.808717, "latitude": 41.665612}}'
+      ]
       var timeout = 0
       payloads.forEach(element => {
 
         setTimeout(() => {
           props.actions.setPayload(element)
           props.publish()
-          console.log("jeje")
+
         }, timeout)
-        timeout += 10000
+        if (payloads.indexOf(element) % 2 == 0) timeout += 1000;
+        else timeout += 9000
+
       });
     },
-    [props.publish]
+    [props.publish, props.actions, props.VIN]
   )
 
   return (
@@ -242,6 +278,20 @@ const Testing = memo(function TestingButton(props: { publish: () => void; focusE
     >
       <Navigation style={{ marginRight: '8px' }} /> Demo Test
     </Button>
+  )
+}
+
+const VINSelector = memo(function VINSelector(props: { setVIN: any }) {
+
+  return (
+    <Select
+      id="demo-simple-select"
+      label="VIN"
+      onChange={props.setVIN}
+    >
+      <MenuItem value={"TestDevice1"}>TestDevice1</MenuItem>
+      <MenuItem value={"TestDevice2"}>TestDevice2</MenuItem>
+    </Select>
   )
 })
 
